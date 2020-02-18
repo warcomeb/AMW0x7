@@ -47,7 +47,7 @@ extern "C" {
 #include "amw0x7type.h"
 
 #if !defined (WARCOMEB_AMW0x7_RX_BUFFER)
-#define WARCOMEB_AMW0x7_RX_BUFFER               128
+#define WARCOMEB_AMW0x7_RX_BUFFER               0xFF
 #endif
 
 /*!
@@ -56,12 +56,11 @@ extern "C" {
 typedef struct _AMW0x7_Device_t
 {
     Uart_DeviceHandle        device;
-    Uart_Config              uartConfig;
 
     bool                     isAwake;
     bool                     isConnected;
 
-    uint8_t                  rxBuffer[WARCOMEB_AMW0x7_RX_BUFFER];
+    uint8_t                  rxBuffer[WARCOMEB_AMW0x7_RX_BUFFER+1];
     UtilityBuffer_Descriptor rxDescriptor;
 
     Gpio_Pins                pinReset;
@@ -74,11 +73,23 @@ typedef struct _AMW0x7_Device_t
  */
 typedef struct _AMW0x7_Config_t
 {
-    char deviceName[16];
+    Uart_DeviceHandle        device;
+
+    Gpio_Pins                pinReset;
 
 } AMW0x7_Config_t;
 
-void BGX13P_init (AMW0x7_DeviceHandle_t dev, AMW0x7_Config_t* config);
+/*!
+ *
+ */
+void AMW0x7_uartRxInterrupt (Uart_DeviceHandle dev, void* obj);
+
+/*!
+ *
+ */
+void AMW0x7_uartErrorInterrupt (Uart_DeviceHandle dev, void* obj);
+
+void AMW0x7_init (AMW0x7_DeviceHandle_t dev, AMW0x7_Config_t* config);
 
 /*!
  * This function resets the module.
@@ -98,7 +109,44 @@ AMW0x7_Errors_t AMW0x7_wake (AMW0x7_DeviceHandle_t dev);
 bool AMW0x7_isAwake (AMW0x7_DeviceHandle_t dev);
 
 /*!
+ *
+ * \param[in]      dev:
+ * \param[in]     ssid:
+ * \param[in] password:
+ */
+AMW0x7_Errors_t AMW0x7_connect (AMW0x7_DeviceHandle_t dev,
+                                const char* ssid,
+                                const char* password);
+
+/*!
+ * This function disconnect the module from the network.
+ *
+ * \param[in] dev:
+ * \return
+ */
+AMW0x7_Errors_t AMW0x7_disconnect (AMW0x7_DeviceHandle_t dev);
+
+/*!
+ * This function scans for available Wi-Fi networks.
+ *
+ * \param[in] dev:
+ * \return
+ */
+AMW0x7_Errors_t AMW0x7_scan (AMW0x7_DeviceHandle_t dev);
+
+/*!
+ * The function ping a remote device on the network.
+ *
+ * \param[in]     dev:
+ * \param[in] address:
+ */
+AMW0x7_Errors_t AMW0x7_ping (AMW0x7_DeviceHandle_t dev,
+                             const char* address);
+
+/*!
  * This function ask to the module the current firmware version.
+ *
+ * \param[in]
  */
 AMW0x7_Errors_t AMW0x7_getFirmwareVersion (AMW0x7_DeviceHandle_t dev, char* data);
 

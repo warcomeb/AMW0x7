@@ -42,12 +42,23 @@ extern "C" {
 #endif
 
 /*!
+ * Maximum length of a SSID
+ */
+#define AMW0x7_SSID_MAX_LENGTH                   32
+/*!
+ * Maximum length of WPA passphrase.
+ * Valid lengths are 8-63.
+ */
+#define AMW0x7_WPA_KEY_MAX_LENGTH                63
+
+/*!
  * List of possible module errors.
  */
 typedef enum _AMW0x7_Errors
 {
     AMW0x7_ERRORS_NO_ERROR,
     AMW0x7_ERRORS_COMMAND_FAIL,
+    AMW0x7_ERRORS_COMMAND_TIMEOUT,
     AMW0x7_ERRORS_CONNECTION_FAIL,
 } AMW0x7_Errors_t;
 
