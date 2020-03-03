@@ -30,12 +30,7 @@
  */
 
 #include "amw0x7.h"
-
-#if !defined (WARCOMEB_AMW0x7_PORT)   || \
-    !defined (WARCOMEB_AMW0x7_PIN_RX) || \
-    !defined (WARCOMEB_AMW0x7_PIN_TX)
-#error "[AMW0x7]: YOU MUST DEFINE UART PORT AND PINS!"
-#endif
+#include <string.h>
 
 #define AMW0x7_COMMAND_END_LINE                  "\r\n"
 #define AMW0x7_COMMAND_DONE                      "> "
@@ -157,8 +152,15 @@ static AMW0x7_Errors_t readCommand (AMW0x7_DeviceHandle_t dev,
                 (memcmp(AMW0x7_COMMAND_DONE, (const char *) &response[responseIndex-2], strlen(AMW0x7_COMMAND_DONE)) == 0))
             {
                 err = AMW0x7_ERRORS_NO_ERROR;
+
                 // Copy the module reply back!
                 strcpy(reply,response);
+
+                // Delete the command into reply
+                char *start = strstr(reply, text);
+                char *stop  = start + strlen(text);
+                memmove(start, start + strlen(text), strlen(stop) + 1);
+
                 UtilityBuffer_flush(&dev->rxDescriptor);
                 break;
             }
